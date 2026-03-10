@@ -1,4 +1,4 @@
-export const sendToken = (res, user, statusCode = 200, message = "") => {
+export const  sendToken = (res, user, statusCode = 200, message = "") => {
   const token = user.getJWTToken();
 
   const userData = {

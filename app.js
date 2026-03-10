@@ -1,6 +1,7 @@
 import express from "express";
 import usersRouter from "./routers/userRouter.js";
 import cookieParser from "cookie-parser";
+import productRouter  from "./routers/productRouter.js";
 
 export const app = express();
 
@@ -10,3 +11,4 @@ app.use(cookieParser())
 
 // Mount routers
 app.use("/api/v1", usersRouter);
+app.use("/api/v1/product", productRouter);

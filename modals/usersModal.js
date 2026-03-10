@@ -35,9 +35,11 @@ const userSchema = new mongoose.Schema({
   resetPasswordOtp:Number,
   resetPassword_Expire :Date
 });
-userSchema.pre("save", async function(next){
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10)
+userSchema.pre("save", async function () {
+  // When using async middleware with Mongoose, don't use the `next` callback.
+  // Return early when password is not modified.
+  if (!this.isModified("password")) return;
+  const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 

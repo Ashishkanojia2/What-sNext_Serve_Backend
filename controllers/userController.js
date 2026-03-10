@@ -4,6 +4,11 @@ import { emailRegex, passwordRegex } from "../utils/regex.js";
 import { sendToken } from "../utils/sendToken.js";
 import sendMail from "../utils/sendMail.js";
 import { getOtp } from "../utils/otpGenerate.js";
+
+const getUserData = async (email) => {
+  return await userModal.findOne({ email }).select("+password");
+};
+
 const register = async (req, res) => {
   try {
     let { name, email, password } = req.body;
@@ -44,7 +49,7 @@ const verify = async (req, res) => {
       return errorRes(res, 400, "otp expire. please resend the otp");
     }
     if (user.otp === otp) {
-      user.verify = true;
+      user.verified = true;
       user.otp = null;
       user.otp_expiry = null;
       await user.save();
@@ -84,7 +89,7 @@ const forgotPassword = async (req, res) => {
   const { email } = req.body;
   if (!email) errorRes(res, 400, "Please enter email");
   const user = await userModal.findOne({ email });
-  if (!user) return errorRes(res, 400, "User not found");
+  if (!user) return errorRes(res, 400, "Invalid email");
   const otp = getOtp();
 
   user.resetPasswordOtp = otp;
@@ -93,8 +98,16 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  const { oldPassword, newPassword } = req.body;
+  const { email, newPassword } = req.body;
+  const user = await getUserData(email);
+  if (!user) return errorRes(res, 400, "Invalid email");
+ user.password = newPassword;
+  user.resetPasswordOtp = null
+  user.resetPassword_Expire = null
+  await user.save();
+  successRes(res, 200, "Password reset successfully");
 };
+
 
 const logout = async (req, res) => {
   res
