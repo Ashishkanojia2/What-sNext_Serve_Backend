@@ -101,13 +101,12 @@ const resetPassword = async (req, res) => {
   const { email, newPassword } = req.body;
   const user = await getUserData(email);
   if (!user) return errorRes(res, 400, "Invalid email");
- user.password = newPassword;
-  user.resetPasswordOtp = null
-  user.resetPassword_Expire = null
+  user.password = newPassword;
+  user.resetPasswordOtp = null;
+  user.resetPassword_Expire = null;
   await user.save();
   successRes(res, 200, "Password reset successfully");
 };
-
 
 const logout = async (req, res) => {
   res
