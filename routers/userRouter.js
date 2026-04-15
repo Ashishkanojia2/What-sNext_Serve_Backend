@@ -4,6 +4,7 @@ import {
   login,
   register,
   resetPassword,
+  updatePasssword,
   verify,
 } from "../controllers/userController.js";
 import isAuthenticated from "../middleware/auth.js";
@@ -17,5 +18,6 @@ usersRouter.route("/login").post(login);
 usersRouter.route("/verify").post(isAuthenticated, verify);
 usersRouter.route("/forgotPassword").post(forgotPassword);
 usersRouter.route("/resetPassword").post(resetPassword);
+usersRouter.route("/updatePassword").post(isAuthenticated, updatePasssword);
 
 export default usersRouter;

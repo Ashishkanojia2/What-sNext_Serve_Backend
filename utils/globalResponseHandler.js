@@ -1,14 +1,13 @@
-const successRes = (res, statusCode, message) => {
-  res.status(statusCode).json({ status: statusCode, success: true, message });
+const successRes = (res, status, message) => {
+  res.status(status).json({ status, success: true, message });
 };
-const successResSend = (res, statusCode, message, result) => {
-  res
-    .status(statusCode)
-    .json({ status, statusCode, success: true, message, result });
+const successReSend = (res, status, message, result) => {
+  res.status(status).json({ status, success: true, message, result });
 };
 
-const errorRes = (res, statusCode, message) => {
-  res.status(statusCode).json({ status: statusCode, success: false, message });
+const errorRes = (res, status, message) => {
+  res.status(status).json({ status, success: false, message });
 };
 
-export { successRes, errorRes, successResSend };
+export { successRes, errorRes, successReSend };
+  

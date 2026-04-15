@@ -1,12 +1,23 @@
 import { productModal } from "../modals/productModal.js";
-import { errorRes, successRes, successResSend } from "../utils/globalResponseHandler.js";
+import {
+  errorRes,
+  successRes,
+  successReSend,
+} from "../utils/globalResponseHandler.js";
 
 export const getAllProducts = async (req, res) => {
   try {
-    const products = await productModal.find();
-    if (products.length === 0) return errorRes(res, 404, "No products found");
+    const { category } = req.query || {};
+    console.log("category", category);
 
-    successResSend(res, 200, "Products fetched successfully", products);
+    const filter = category ? { categories: category } : "all";
+    console.log("filter", filter);
+
+    const products = await productModal.find(filter === "all" ? {} : filter);
+    if (products.length === 0) return errorRes(res, 404, "No products found");
+    console.log("res ",   products);
+    
+    successReSend(res, 200,  `${category} products fetched successfully`, products);
   } catch (error) {
     errorRes(res, 500, error.message);
   }
@@ -25,7 +36,7 @@ export const addProduct = async (req, res) => {
       reviews,
     } = req.body || {};
     console.log("reqBody", req.body);
-    
+
     if (!productName) return errorRes(res, 400, "Please enter product name");
     if (!description)
       return errorRes(res, 400, "Please enter product description");
@@ -38,15 +49,16 @@ export const addProduct = async (req, res) => {
       price,
       image: {
         public_id: "sample_public_id",
-        url: 'https://drive.google.com/file/d/1YVM6sObwDR3Vt02IwRSilQA9rV7DrbUH/view',
+        url: "https://drive.google.com/file/d/1YVM6sObwDR3Vt02IwRSilQA9rV7DrbUH/view",
       },
       categories,
       rating,
       numberOfReviews,
-      reviews : [],
+      reviews: [],
     });
 
     await newProduct.save();
+    console.log("response ", res);
     successRes(res, 201, "Product added successfully");
   } catch (error) {
     errorRes(res, 500, error.message);

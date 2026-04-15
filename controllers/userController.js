@@ -4,6 +4,7 @@ import { emailRegex, passwordRegex } from "../utils/regex.js";
 import { sendToken } from "../utils/sendToken.js";
 import sendMail from "../utils/sendMail.js";
 import { getOtp } from "../utils/otpGenerate.js";
+import cloudinary from "cloudinary";
 
 const getUserData = async (email) => {
   return await userModal.findOne({ email }).select("+password");
@@ -11,6 +12,21 @@ const getUserData = async (email) => {
 
 const register = async (req, res) => {
   try {
+    const { avatar } = req.files || {};
+    cloudinary.v2.uploader
+      .upload(avatar.tempFilePath, {
+        folder: "avatars",
+      })
+      .then((result) => {
+        console.log("Cloudinary Result", result);
+        res
+          .status(200)
+          .json({
+            success: true,
+            message: "Avatar uploaded successfully",
+            url: result.secure_url,
+          });
+      });
     let { name, email, password } = req.body;
     let user = await userModal.findOne({ email });
     if (user) return errorRes(res, 400, "user already exists");
@@ -79,8 +95,21 @@ const login = async (req, res) => {
     let user = await userModal.findOne({ email }).select("+password");
     if (!user) return errorRes(res, 400, "Invalid crendintals");
     const isMatch = await user.comparePassword(password);
-    if (!isMatch) errorRes(res, 400, "Invalid crendintals");
-    successRes(res, 200, "Login Successfully");
+    if (!isMatch) return errorRes(res, 400, "Invalid crendintals");
+    const token = await user.getJWTToken();
+    return res
+      .status(200)
+      .cookie("token", token)
+      .json({
+        success: true,
+        message: "Login Successfully",
+        token,
+        user: {
+          email: user.email,
+          name: user.name,
+          _id: user._id,
+        },
+      });
   } catch (error) {
     errorRes(res, 500, error.message);
   }
@@ -114,4 +143,30 @@ const logout = async (req, res) => {
     .cookie("token", null, { expires: new Date(Date.now()) })
     .json({ success: true, message: "Logout successfully" });
 };
-export { register, login, verify, forgotPassword, resetPassword, logout };
+
+const updatePasssword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword)
+      return errorRes(res, 400, "Please enter old and new password");
+    const user = await getUserData(req.user.email);
+    if (!user) return errorRes(res, 400, "User not found");
+    const isMatch = await user.comparePassword(oldPassword);
+    if (!isMatch) return errorRes(res, 400, "Invalid old password");
+    user.password = newPassword;
+    await user.save();
+    successRes(res, 200, "Password updated successfully");
+  } catch (error) {
+    errorRes(res, 500, error.message);
+  }
+};
+
+export {
+  register,
+  login,
+  verify,
+  forgotPassword,
+  resetPassword,
+  logout,
+  updatePasssword,
+};
