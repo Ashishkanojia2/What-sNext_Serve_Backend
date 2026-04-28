@@ -8,15 +8,9 @@ import {
 export const getAllProducts = async (req, res) => {
   try {
     const { category } = req.query || {};
-    console.log("category", category);
-
     const filter = category ? { categories: category } : "all";
-    console.log("filter", filter);
-
     const products = await productModal.find(filter === "all" ? {} : filter);
     if (products.length === 0) return errorRes(res, 404, "No products found");
-    console.log("res ",   products);
-    
     successReSend(res, 200,  `${category} products fetched successfully`, products);
   } catch (error) {
     errorRes(res, 500, error.message);
@@ -35,8 +29,6 @@ export const addProduct = async (req, res) => {
       numberOfReviews,
       reviews,
     } = req.body || {};
-    console.log("reqBody", req.body);
-
     if (!productName) return errorRes(res, 400, "Please enter product name");
     if (!description)
       return errorRes(res, 400, "Please enter product description");
@@ -58,7 +50,6 @@ export const addProduct = async (req, res) => {
     });
 
     await newProduct.save();
-    console.log("response ", res);
     successRes(res, 201, "Product added successfully");
   } catch (error) {
     errorRes(res, 500, error.message);

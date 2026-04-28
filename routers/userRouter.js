@@ -1,23 +1,12 @@
 import express from "express";
-import {
-  forgotPassword,
-  login,
-  register,
-  resetPassword,
-  updatePasssword,
-  verify,
-} from "../controllers/userController.js";
 import isAuthenticated from "../middleware/auth.js";
+import { profile } from "../controllers/userController.js";
 
 const usersRouter = express.Router();
 usersRouter.get("/test", (req, res) => {
   res.json({ success: true, message: "Welcome to User API" });
 });
-usersRouter.route("/register").post(register);
-usersRouter.route("/login").post(login);
-usersRouter.route("/verify").post(isAuthenticated, verify);
-usersRouter.route("/forgotPassword").post(forgotPassword);
-usersRouter.route("/resetPassword").post(resetPassword);
-usersRouter.route("/updatePassword").post(isAuthenticated, updatePasssword);
+
+usersRouter.route("/profile").get(isAuthenticated, profile);
 
 export default usersRouter;

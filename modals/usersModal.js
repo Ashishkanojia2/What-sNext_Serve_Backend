@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -32,8 +32,17 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  resetPasswordOtp:Number,
-  resetPassword_Expire :Date
+  query: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserQuery",
+      },
+    ],
+    default: [],
+  },
+  resetPasswordOtp: Number,
+  resetPassword_Expire: Date,
 });
 userSchema.pre("save", async function () {
   // When using async middleware with Mongoose, don't use the `next` callback.
@@ -48,10 +57,9 @@ userSchema.methods.getJWTToken = function () {
     expiresIn: process.env.JWT_TOKEN_EXPIRE * 24 * 60 * 60 * 1000,
   });
 };
-userSchema.methods.comparePassword = async function(password){
- return await bcrypt.compare(password , this.password)
-
-}
-userSchema.index({otp_expiry:1},{expireAfterSeconds:0})
+userSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+userSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 });
 
 export const userModal = mongoose.model("User", userSchema);

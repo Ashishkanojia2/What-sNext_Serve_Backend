@@ -3,6 +3,8 @@ import usersRouter from "./routers/userRouter.js";
 import cookieParser from "cookie-parser";
 import productRouter  from "./routers/productRouter.js";
 import fileUpload from "express-fileupload";
+import AuthRouter from "./routers/AuthRouter.js";
+import AppRouter from "./routers/AppRouter.js";
 
 export const app = express();
 
@@ -15,8 +17,11 @@ app.use(fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 },
     // abortOnLimit: true,
     // responseOnLimit: "File size limit has been reached",
+
 }))
 
 // Mount routers
-app.use("/api/v1", usersRouter);
+app.use("/api/v1", AuthRouter);
+app.use("/api/v1/user", usersRouter);
 app.use("/api/v1/product", productRouter);
+app.use('/api/v1/app',AppRouter)
