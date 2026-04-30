@@ -4,6 +4,7 @@ import {
   successRes,
   successReSend,
 } from "../utils/globalResponseHandler.js";
+import { productIdRegex } from "../utils/regex.js";
 
 export const getAllProducts = async (req, res) => {
   try {
@@ -11,7 +12,12 @@ export const getAllProducts = async (req, res) => {
     const filter = category ? { categories: category } : "all";
     const products = await productModal.find(filter === "all" ? {} : filter);
     if (products.length === 0) return errorRes(res, 404, "No products found");
-    successReSend(res, 200,  `${category} products fetched successfully`, products);
+    successReSend(
+      res,
+      200,
+      `${category} products fetched successfully`,
+      products,
+    );
   } catch (error) {
     errorRes(res, 500, error.message);
   }
@@ -53,5 +59,27 @@ export const addProduct = async (req, res) => {
     successRes(res, 201, "Product added successfully");
   } catch (error) {
     errorRes(res, 500, error.message);
+  }
+};
+
+export const getSingleProductInfo = async (req, res) => {
+  try {
+    const { productId } = req.query;
+    console.log("productId", productId);
+
+    if (!productId) {
+      return errorRes(res, 400, "Product id is missing");
+    }
+    if (productIdRegex({ productId })) {
+      return errorRes(res, 400, "Invalid product id");
+    }
+
+    const product = await productModal.findOne({ _id: productId });
+    if (!product) {
+      return errorRes(res, 404, "Product not found");
+    }
+    return successReSend(res, 200, "Product successfully fetched", product);
+  } catch (error) {
+    return errorRes(res, 500, error.message);
   }
 };
