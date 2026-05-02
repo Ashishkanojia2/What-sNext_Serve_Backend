@@ -13,11 +13,9 @@ const productSchema = new mongoose.Schema({
         type : Number,
         required : true
     },
-    imageUrl : {
-        // type : String,
-        // required : true
-        public_id : String,
-        url : String
+    imageUrl: {
+        public_id: String,
+        url: String
     },
     createdAt : {
         type : Date,
@@ -34,26 +32,24 @@ const productSchema = new mongoose.Schema({
         type : Number,
         default : 0
     },
-    reviews:[
+
+    size: {
+        type: [String],
+        enum: ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'],
+    },
+    color: {
+        type: [String],
+        default: []
+    },
+
+    reviews: [
         {
-            userId:{
-                type : mongoose.Schema.Types.ObjectId,
-                ref : "User",
-                required : true
-            },
-            name:{
-                type : String,
-                required : true
-            },
-            rating:{
-                type : Number,
-                required : true
-            },
-            comment:{
-                type : String,
-                required : true
-            }
-        }
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "ProductReview",
+            required: true
+        },
+
+
     ]
 })
 

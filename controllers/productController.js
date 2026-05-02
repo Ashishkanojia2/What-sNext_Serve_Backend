@@ -1,4 +1,5 @@
 import { productModal } from "../modals/productModal.js";
+import { ProductReviewModal } from "../modals/ProductReviewModal.js";
 import {
   errorRes,
   successRes,
@@ -34,12 +35,13 @@ export const addProduct = async (req, res) => {
       rating,
       numberOfReviews,
       reviews,
+      size,
+      color,
     } = req.body || {};
     if (!productName) return errorRes(res, 400, "Please enter product name");
     if (!description)
       return errorRes(res, 400, "Please enter product description");
     if (!price) return errorRes(res, 400, "Please enter product price");
-    // if (!image) return errorRes(res, 400, "Please enter product image");
 
     const newProduct = new productModal({
       productName,
@@ -49,10 +51,12 @@ export const addProduct = async (req, res) => {
         public_id: "sample_public_id",
         url: "https://drive.google.com/file/d/1YVM6sObwDR3Vt02IwRSilQA9rV7DrbUH/view",
       },
+      reviews,
       categories,
       rating,
       numberOfReviews,
-      reviews: [],
+      size,
+      color,
     });
 
     await newProduct.save();
@@ -83,3 +87,46 @@ export const getSingleProductInfo = async (req, res) => {
     return errorRes(res, 500, error.message);
   }
 };
+
+export const postReview = async (req, res) => {
+  try {
+    const { name, comment, rating, productId } = req.body
+    const user = req.user;
+    if (!user?._id) {
+      return errorRes(res, 401, "User not authenticated");
+    }
+    if (!productId) {
+      return errorRes(res, 400, "ProductId is required");
+    }
+
+    if (!name || !comment || !rating) {
+      return errorRes(res, 400, "All fields are required");
+    }
+
+    if (rating < 1 || rating > 5) {
+      return errorRes(res, 400, "Rating must be between 1 and 5");
+    }
+    const product = await productModal.findById(productId)
+    if (!product._id) return errorRes(res, 404, "Product not found");
+
+    const reviewData = new ProductReviewModal({
+      userId: user._id,
+      name,
+      comment,
+      rating,
+      productId
+    })
+    user.reviews.push(reviewData._id);
+    product.reviews.push(reviewData._id);
+    Promise.all([
+      reviewData.save(),
+      user.save(),
+      product.save()
+    ])
+    return successRes(res, 201, "Thank you for your support!");
+  } catch (error) {
+    console.log("getting error while post user reiview on the post")
+  }
+
+
+}

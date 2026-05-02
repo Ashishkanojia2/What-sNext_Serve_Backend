@@ -1,6 +1,6 @@
 import express from "express";
 import isAuthenticated from "../middleware/auth.js";
-import { profile } from "../controllers/userController.js";
+import { profile, updateProfile } from "../controllers/userController.js";
 
 const usersRouter = express.Router();
 usersRouter.get("/test", (req, res) => {
@@ -8,5 +8,6 @@ usersRouter.get("/test", (req, res) => {
 });
 
 usersRouter.route("/profile").get(isAuthenticated, profile);
+usersRouter.route("/updateProfile").post(isAuthenticated, updateProfile);
 
 export default usersRouter;

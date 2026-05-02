@@ -6,17 +6,20 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    trim:true
   },
   email: {
     type: String,
     required: true,
     unique: true,
+    trim: true
   },
   password: {
     type: String,
     required: true,
     minlength: [8, "Password must be at least 8 characters long"],
     select: false,
+    trim:true
   },
   avatar: {
     publicId: String,
@@ -24,10 +27,9 @@ const userSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now,
+    timestamps: true
+
   },
-  otp: Number,
-  otp_expiry: Date,
   verified: {
     type: Boolean,
     default: false,
@@ -41,12 +43,39 @@ const userSchema = new mongoose.Schema({
     ],
     default: [],
   },
+  reviews: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProductReview",
+      required: true
+    },
+  ],
+  phone: {
+    type: String,
+    // validate: {
+    //   validator: function (v) {
+    //     if (!v) return true;
+    //     const clean = v.replace(/\s+/g, "");
+    //     return /^(\+91)?[6-9]\d{9}$/.test(clean);
+    //   },
+    //   message: "Invalid Indian phone number"
+    // }
+  },
+  landMark: {
+    type: String
+  },
+  pinCode: {
+    type: String
+  },
+  address: {
+    type: String
+  },
+  otp: Number,
+  otp_expiry: Date,
   resetPasswordOtp: Number,
   resetPassword_Expire: Date,
 });
 userSchema.pre("save", async function () {
-  // When using async middleware with Mongoose, don't use the `next` callback.
-  // Return early when password is not modified.
   if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
@@ -61,5 +90,4 @@ userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 userSchema.index({ otp_expiry: 1 }, { expireAfterSeconds: 0 });
-
 export const userModal = mongoose.model("User", userSchema);

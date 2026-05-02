@@ -71,7 +71,7 @@ const verify = async (req, res) => {
       user.otp = null;
       user.otp_expiry = null;
       await user.save();
-      return successRes(res, 201, "user verify successfully");
+      return successRes(res, 200, "user verify successfully");
     } else {
       errorRes(res, 400, "Invalid OTP");
     }
@@ -94,7 +94,7 @@ const login = async (req, res) => {
         "Password must contain 8 char, 1 uppercase, 1 number, and 1 special char.",
       );
     let user = await userModal.findOne({ email }).select("+password");
-    if (!user) return errorRes(res, 400, "Invalid crendintals");
+    if (!user) return errorRes(res, 400, "User not found!");
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return errorRes(res, 400, "Invalid crendintals");
     const token = await user.getJWTToken();
