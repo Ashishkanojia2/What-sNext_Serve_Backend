@@ -8,6 +8,6 @@ usersRouter.get("/test", (req, res) => {
 });
 
 usersRouter.route("/profile").get(isAuthenticated, profile);
-usersRouter.route("/updateProfile").post(isAuthenticated, updateProfile);
+usersRouter.route("/updateProfile").put(isAuthenticated, updateProfile);
 
 export default usersRouter;

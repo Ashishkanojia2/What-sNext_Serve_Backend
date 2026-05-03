@@ -41,6 +41,11 @@ const productSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+    companyName:{
+        type:String,
+        required:true,
+        
+    },
 
     reviews: [
         {

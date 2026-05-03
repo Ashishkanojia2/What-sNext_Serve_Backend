@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
     trim:true
   },
   avatar: {
-    publicId: String,
+    public_id: String,
     url: String,
   },
   createdAt: {
