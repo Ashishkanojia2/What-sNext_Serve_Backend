@@ -1,6 +1,7 @@
 import express from "express";
 import isAuthenticated from "../middleware/auth.js";
 import { profile, updateProfile } from "../controllers/userController.js";
+import { upload } from "../middleware/multer.js";
 
 const usersRouter = express.Router();
 usersRouter.get("/test", (req, res) => {
@@ -8,6 +9,8 @@ usersRouter.get("/test", (req, res) => {
 });
 
 usersRouter.route("/profile").get(isAuthenticated, profile);
-usersRouter.route("/updateProfile").put(isAuthenticated, updateProfile);
+usersRouter
+  .route("/updateProfile")
+  .put(upload.single("avatar"), isAuthenticated, updateProfile);
 
 export default usersRouter;

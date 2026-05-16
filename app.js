@@ -9,18 +9,16 @@ import AppRouter from "./routers/AppRouter.js";
 export const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser())
-app.use(fileUpload({
-    useTempFiles: true,
-    // tempFileDir: "/tmp/",
-    limits: { fileSize: 50 * 1024 * 1024 },
-    // abortOnLimit: true,
-    // responseOnLimit: "File size limit has been reached",
+// app.use(fileUpload({
+//     useTempFiles: true,
+//     // tempFileDir: "/tmp/",
+//     limits: { fileSize: 50 * 1024 * 1024 },
+//     // abortOnLimit: true,
 
-}))
+// }))
 
-// Mount routers
 app.use("/api/v1", AuthRouter);
 app.use("/api/v1/user", usersRouter);
 app.use("/api/v1/product", productRouter);

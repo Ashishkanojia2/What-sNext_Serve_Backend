@@ -17,7 +17,7 @@ export const getAllProducts = async (req, res) => {
     successReSend(
       res,
       200,
-      `${category} products fetched successfully`,
+      `${category ?? "All"} products fetched successfully`,
       products,
     );
   } catch (error) {
