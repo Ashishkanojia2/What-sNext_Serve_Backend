@@ -6,20 +6,20 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim:true
+    trim: true,
   },
   email: {
     type: String,
     required: true,
     unique: true,
-    trim: true
+    trim: true,
   },
   password: {
     type: String,
     required: true,
     minlength: [8, "Password must be at least 8 characters long"],
     select: false,
-    trim:true
+    trim: true,
   },
   avatar: {
     public_id: String,
@@ -27,8 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    timestamps: true
-
+    timestamps: true,
   },
   verified: {
     type: Boolean,
@@ -47,29 +46,27 @@ const userSchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ProductReview",
-      required: true
+      required: true,
     },
   ],
   phone: {
     type: String,
-    // validate: {
-    //   validator: function (v) {
-    //     if (!v) return true;
-    //     const clean = v.replace(/\s+/g, "");
-    //     return /^(\+91)?[6-9]\d{9}$/.test(clean);
-    //   },
-    //   message: "Invalid Indian phone number"
-    // }
   },
   landMark: {
-    type: String
+    type: String,
   },
   pinCode: {
-    type: String
+    type: String,
   },
   address: {
-    type: String
+    type: String,
   },
+  placedOrders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+    },
+  ],
   otp: Number,
   otp_expiry: Date,
   resetPasswordOtp: Number,

@@ -1,10 +1,10 @@
-export const  sendToken = (res, user, statusCode = 200, message = "") => {
-  const token = user.getJWTToken();
+export const sendToken = (res, data, statusCode = 200, message = "") => {
+  const token = data.getJWTToken();
 
   const userData = {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
+    _id: data._id,
+    name: data.name,
+    email: data.email,
   };
 
   const expiresInMinutes = Number(process.env.JWT_TOKEN_EXPIRE) || 60;
