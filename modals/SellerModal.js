@@ -83,4 +83,6 @@ sellerSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-export const sellerModal = mongoose.model("Seller", sellerSchema);
+// export const sellerModal = mongoose.model("Seller", sellerSchema);
+export const sellerModal =
+  mongoose.models.Seller || mongoose.model("Seller", sellerSchema);

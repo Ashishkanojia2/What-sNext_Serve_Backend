@@ -46,6 +46,11 @@ const productSchema = new mongoose.Schema({
         required:true,
         
     },
+    sellerId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Seller",
+        required: true
+    },
 
     reviews: [
         {

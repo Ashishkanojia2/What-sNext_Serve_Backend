@@ -1,10 +1,11 @@
 import express from "express";
 
-import isAuthenticated from "../middleware/auth.js";
+import {isAuthenticated} from "../middleware/auth.js";
 import {
   forgotPassword,
   login,
   register,
+  resendOtp,
   resetPassword,
   updatePasssword,
   verify,
@@ -17,6 +18,7 @@ AuthRouter.get("/test", (req, res) => {
 AuthRouter.route("/register").post(register);
 AuthRouter.route("/login").post(login);
 AuthRouter.route("/verify").post(isAuthenticated, verify);
+AuthRouter.route("/resendOtp").get(isAuthenticated, resendOtp);
 AuthRouter.route("/forgotPassword").post(forgotPassword);
 AuthRouter.route("/resetPassword").post(resetPassword);
 AuthRouter.route("/updatePassword").post(isAuthenticated, updatePasssword);

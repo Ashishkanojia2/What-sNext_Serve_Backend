@@ -1,8 +1,5 @@
 import { userModal } from "../modals/usersModal.js";
-import {
-  errorRes,
-  successReSend,
-} from "../utils/globalResponseHandler.js";
+import { errorRes, successReSend } from "../utils/globalResponseHandler.js";
 import cloudinary from "cloudinary";
 
 export const getUserData = async (email) => {
@@ -19,18 +16,30 @@ export const profile = async (req, res) => {
   }
 };
 export const updateProfile = async (req, res) => {
+  console.log("pointer inside the function");
   try {
     const { pinCode, address, landMark, phone, name } = req.body || {};
+    const { avatar } = req.files;
+    console.log("avatar", avatar);
     const user = req.user;
+    console.log(
+      "______________________________user__________________________",
+      user,
+    );
     if (!user?._id) return errorRes(res, 403, "user not found login first");
+
     let myCloudeProfile = user.avatar;
-    if (req.file?.path) {
+    if (avatar?.tempFilePath) {
       if (user?.avatar?.public_id) {
         await cloudinary.v2.uploader.destroy(user.avatar.public_id);
       }
-      const uploaded = await cloudinary.v2.uploader.upload(req.file.path, {
+      const uploaded = await cloudinary.v2.uploader.upload(avatar?.tempFilePath, {
         folder: "whatNext_usersProfle",
       });
+      console.log(
+        "______________________________uploadded______________________________",
+        uploaded,
+      );
 
       myCloudeProfile = {
         public_id: uploaded.public_id,

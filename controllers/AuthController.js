@@ -95,6 +95,13 @@ const login = async (req, res) => {
       );
     let user = await userModal.findOne({ email }).select("+password");
     if (!user) return errorRes(res, 400, "User not found!");
+    if (user.verified === false) {
+      return errorRes(
+        res,
+        400,
+        "User not verified. Please verify your account.",
+      );
+    }
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return errorRes(res, 400, "Invalid crendintals");
     const token = await user.getJWTToken();
@@ -125,6 +132,23 @@ const forgotPassword = async (req, res) => {
   user.resetPasswordOtp = otp;
   user.resetPassword_Expire = Date.now() + 10 * 60 * 1000;
   successRes(res, 200, "Successfull");
+};
+const resendOtp = async (req, res) => {
+     const user = await userModal.findById(req.user._id);
+  if (!user) return errorRes(res, 400, "Invalid user");
+  const otp = Math.floor(Math.random() * 100000);
+  const otp_expiry = new Date(
+    Date.now() + Number(process.env.OTP_EXPIRE || 10) * 60 * 1000,
+  );
+  user.otp = otp;
+  user.otp_expiry = otp_expiry;
+  await user.save();
+  successRes(res, 200, "OTP sent successfully");
+
+  user = await userModal.create({
+    otp,
+    otp_expiry,
+  });
 };
 
 const resetPassword = async (req, res) => {
@@ -169,4 +193,5 @@ export {
   resetPassword,
   logout,
   updatePasssword,
+  resendOtp,
 };

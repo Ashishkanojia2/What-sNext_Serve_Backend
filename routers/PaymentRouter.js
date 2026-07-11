@@ -1,5 +1,5 @@
 import express from "express";
-import isAuthenticated from "../middleware/auth.js";
+import {isAuthenticated} from "../middleware/auth.js";
 import { paymentCreate } from "../controllers/PaymentController.js";
 
 const PaymentRouter = express.Router();

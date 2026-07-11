@@ -4,7 +4,7 @@ import {
   PrivacyPolicy,
   contactUs,
 } from "../controllers/AppController.js";
-import isAuthenticated from "../middleware/auth.js";
+import {isAuthenticated} from "../middleware/auth.js";
 
 const AppRouter = express.Router();
 

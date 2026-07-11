@@ -1,5 +1,6 @@
 import { productModal } from "../modals/productModal.js";
 import { ProductReviewModal } from "../modals/ProductReviewModal.js";
+import { sellerModal } from "../modals/SellerModal.js";
 import {
   errorRes,
   successRes,
@@ -26,6 +27,9 @@ export const getAllProducts = async (req, res) => {
 };
 
 export const addProduct = async (req, res) => {
+  console.log("req.body", req.body);
+  console.log("req.files", req.files);
+
   try {
     const {
       productName,
@@ -39,45 +43,68 @@ export const addProduct = async (req, res) => {
       color,
       companyName,
     } = req.body || {};
-    const imageUrl = req.files.imageUrl;
+    // const imageUrl = req.files.imageUrl;
 
-    console.log("imageUrl", imageUrl);
+    console.log("Received product data:📈", req.body);
+    const seller = req.seller;
+    console.log("Seller info from req.seller", seller);
     if (!productName) return errorRes(res, 400, "Please enter product name");
     if (!description)
       return errorRes(res, 400, "Please enter product description");
     if (!price) return errorRes(res, 400, "Please enter product price");
-    if (!imageUrl) return errorRes(res, 400, "Please select image");
+    // if (!imageUrl) return errorRes(res, 400, "Please select image");
     if (!companyName) return errorRes(res, 400, "Please provide company name");
 
-    const ProductImage = await cloudinary.v2.uploader.upload(
-      imageUrl?.tempFilePath,
-    );
-
+    // uploaded file (from Postman form-data) should be in req.files.image or similar
+    const imageFile = req.files?.image || req.files?.imageUrl || null;
+    let ProductImage = null;
+    if (imageFile) {
+      ProductImage = await cloudinary.v2.uploader.upload(
+        imageFile.tempFilePath,
+      );
+    }
     const newProduct = new productModal({
       productName: productName.trim(),
       description: description.trim(),
       price: price.trim(),
-      imageUrl: {
-        public_id: ProductImage.public_id,
-        url: ProductImage.secure_url,
-      },
+      imageUrl: ProductImage
+        ? {
+            public_id: ProductImage.public_id,
+            url: ProductImage.secure_url,
+          }
+        : undefined,
       reviews,
       categories,
       rating,
       numberOfReviews,
       size: JSON.parse(size),
       color: JSON.parse(color),
-      companyName
+      companyName,
+      sellerId: seller._id,
     });
-
+    console.log("New product before saving:", newProduct);
     await newProduct.save();
+
+    const sellerData = await sellerModal.findById(seller._id);
+    console.log("Seller data before updating sellingProducts", sellerData);
+    if (sellerData) {
+      sellerData.sellingProducts.push(newProduct._id);
+      await sellerData.save();
+    }
+
     successRes(res, 201, "Product added successfully");
   } catch (error) {
-    errorRes(res, 500, error.message);
+    errorRes(res, 500, error);
+    console.error("ADD PRODUCT ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      stack: error.stack,
+    });
   }
 };
 
-export const getSingleProductInfo = async (req, res) => {
+export const getProductById = async (req, res) => {
   try {
     const { productId } = req.query;
     console.log("productId", productId);
@@ -172,25 +199,21 @@ export const getProductReview = async (req, res) => {
     const totalRecords = productData.reviews.length;
 
     // paginated reviews
-    const product = await productModal
-      .findById(productId)
-      .populate({
-        path: "reviews",
-        options: {
-          skip: skip,
-          limit: Number(limit),
-        },
-      });
+    const product = await productModal.findById(productId).populate({
+      path: "reviews",
+      options: {
+        skip: skip,
+        limit: Number(limit),
+      },
+    });
 
     return successReSend(res, 200, "Reviews fetched", {
       reviews: product.reviews,
       totalRecords: totalRecords,
       currentPage: Number(page),
       totalPages: Math.ceil(totalRecords / Number(limit)),
-      hasMore:
-        skip + product.reviews.length < totalRecords,
+      hasMore: skip + product.reviews.length < totalRecords,
     });
-
   } catch (error) {
     return errorRes(res, 500, error.message);
   }

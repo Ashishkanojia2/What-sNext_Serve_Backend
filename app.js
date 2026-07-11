@@ -8,19 +8,24 @@ import AppRouter from "./routers/AppRouter.js";
 import SellerRouter from "./routers/SellerRouter.js";
 import PaymentRouter from "./routers/PaymentRouter.js";
 import OrderRouter from "./routers/OrderRouter.js";
+import cors from "cors";    
 
 export const app = express();
+// const cors = require("cors")
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-// app.use(fileUpload({
-//     useTempFiles: true,
-//     // tempFileDir: "/tmp/",
-//     limits: { fileSize: 50 * 1024 * 1024 },
-//     // abortOnLimit: true,
-
-// }))
+app.use(cors())
+// enable file uploads for form-data (makes uploaded files available on req.files)
+app.use(
+	fileUpload({
+		useTempFiles: true,
+		tempFileDir: "/tmp/",
+		limits: { fileSize: 50 * 1024 * 1024 },
+		abortOnLimit: true,
+	}),
+);
 
 app.use("/api/v1", AuthRouter);
 app.use("/api/v1/user", usersRouter);
